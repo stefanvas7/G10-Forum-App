@@ -1,5 +1,9 @@
 # G10 Forum App
 
+
+This branch contains the very original code to look back on in the future. The main branch consists of any improvements.
+Keep in mind the other branches Group ID, artifact and maybe other project properties are different to this branches origianl names.
+
 A lightweight Java forum/Q&A project with:
 - A **Spring Boot backend** (`Forum-Server`) that stores posts as JSON files
 - A **Java Swing desktop client** (`Forum-App`) that reads/writes posts through REST endpoints
