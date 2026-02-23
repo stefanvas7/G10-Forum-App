@@ -1,6 +1,6 @@
 # G10 Forum App
 
-
+For some reason the final code ended up with a final application that's not running anymore.
 This branch contains the very original code to look back on in the future. The main branch consists of any improvements.
 Keep in mind the other branches Group ID, artifact and maybe other project properties are different to this branches origianl names.
 
