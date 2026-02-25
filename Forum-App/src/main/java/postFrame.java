@@ -35,7 +35,6 @@ public class postFrame {
         c.ipadx = 1000;
         c.weighty = 1;
         c.weightx = 1;
-        questionPanel.setBackground(Color.red);
         //questionPanel.setSize(1000,400);
         //questionFrame.add(questionPanel,c);
 
