@@ -5,7 +5,8 @@
             "name": "client",
             "request": "launch",
             "mainClass": "client",
-            "projectName": "Q-A-Platform"
+            "projectName": "Q-A-Platform",
+            "preLaunchTask": "Compile Forum-App"
         },
         {
             "type": "java",

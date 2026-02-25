@@ -1,0 +1,32 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Compile Forum-App",
+      "type": "shell",
+      "command": "mvn",
+      "args": [
+        // "-f",
+        // "Forum-App/pom.xml",
+        "compile"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/Forum-App"
+      },
+      "group": "build",
+      "problemMatcher": []
+    },
+    // {
+    //   "label": "Compile forum-server",
+    //   "type": "shell",
+    //   "command": "mvn",
+    //   "args": [
+    //     "-f",
+    //     "forum-server/pom.xml",
+    //     "compile"
+    //   ],
+    //   "group": "build",
+    //   "problemMatcher": []
+    // }
+  ]
+}
