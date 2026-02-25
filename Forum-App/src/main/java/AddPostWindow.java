@@ -1,5 +1,9 @@
 import javax.swing.*;
 
+import java.awt.Color;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+
 
 public class AddPostWindow {
     SpringApi man = new SpringApi();
@@ -12,19 +16,61 @@ public class AddPostWindow {
         JPanel generalPanel = new JPanel();
         generalPanel.setLayout(new BoxLayout(generalPanel, BoxLayout.Y_AXIS));
 
+        
         JButton backButton = new JButton("Back");
         backButton.addActionListener(e -> addFrame.dispose());
         generalPanel.add(backButton);
 
-        JTextField questionField = new JTextField("Add question");
-        generalPanel.add(questionField);
+        String postPlaceholder = "Add question";
+        String descriptionPlaceholder = "Add description (optional)";
+        Color placeholderColor = Color.GRAY;
+        Color inputColor = Color.BLACK;
+        
+        JTextField postInput = new JTextField(postPlaceholder);
+        postInput.setForeground(placeholderColor);
+        postInput.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (postInput.getText().equals(postPlaceholder)){
+                    postInput.setText("");
+                    postInput.setForeground(inputColor);
+                }
+            }
 
-        JTextField descriptionField = new JTextField("Add description (optional)");
-        generalPanel.add(descriptionField);
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (postInput.getText().trim().isEmpty()) {
+                    postInput.setText(postPlaceholder);
+                    postInput.setForeground(placeholderColor);
+                }
+            }
+        });
+        generalPanel.add(postInput);
+        
+
+        JTextField descriptionInput = new JTextField(descriptionPlaceholder);
+        descriptionInput.setForeground(placeholderColor);
+        descriptionInput.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (descriptionInput.getText().equals(descriptionPlaceholder)){
+                    descriptionInput.setText("");
+                    descriptionInput.setForeground(inputColor);
+                }
+            }
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (descriptionInput.getText().trim().isEmpty()) {
+                    descriptionInput.setText(descriptionPlaceholder);
+                    descriptionInput.setForeground(placeholderColor);
+                }
+            }
+        });
+        generalPanel.add(descriptionInput);
 
         JButton post = new JButton("Submit");
         post.addActionListener(e -> {
-            man.callCreatePost(questionField.getText(), descriptionField.getText());
+            man.callCreatePost(postInput.getText(), descriptionInput.getText());
             addFrame.dispose();
         });
         generalPanel.add(post);
