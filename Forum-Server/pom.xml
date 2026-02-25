@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.project</groupId>
-	<artifactId>QAserver</artifactId>
+	<artifactId>ForumServerApp</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>QAserver</name>
+	<name>ForumServerApp</name>
 	<description>Server application for Q&amp;A app</description>
 	<properties>
 		<java.version>20</java.version>

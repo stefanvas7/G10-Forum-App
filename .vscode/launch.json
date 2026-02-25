@@ -2,6 +2,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "client",
+            "request": "launch",
+            "mainClass": "client",
+            "projectName": "Q-A-Platform"
+        },
+        {
+            "type": "java",
             "name": "Spring Boot-QAserverApplication<QAserver>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
@@ -9,6 +16,17 @@
             "projectName": "QAserver",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ForumServerApp<QAserver>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.stefan.projects.forum_server.ForumServerApp",
+            "projectName": "QAserver",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=57821 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=QAserver"
         }
     ]
 }
