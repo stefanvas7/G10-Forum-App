@@ -79,9 +79,9 @@ public class postFrame {
 
         JSONArray answersArray = new JSONArray(postJson.get("answers").toString());
 
-        int answersCount = answersArray.length();
+        int[] answersCount = {answersArray.length()};
 
-        JLabel answerCountLabel = new JLabel("               " + answersCount + " answers");
+        JLabel answerCountLabel = new JLabel("               " + answersCount[0] + " answers");
         questionC.gridx = 0;
         questionC.gridy = 1;
         questionC.ipadx = 200;
@@ -96,9 +96,15 @@ public class postFrame {
         answerScrollPanel.setSize(500,500);
         JPanel answerPanel = new JPanel();
         answerPanel.setLayout(new BoxLayout(answerPanel, BoxLayout.Y_AXIS));
-        for(int i = 0; i < answersCount - 1; i++){
-            answerPanel.add(formatAnswer(answersArray.getJSONObject(i).get("username").toString() + "     |     ", answersArray.getJSONObject(i).get("answer").toString()));
+        for(int i = 0; i < answersCount[0]; i++){
+            if ("".equals(answersArray.getJSONObject(i).optString("answer", ""))){
+                answerPanel.add(new AnswerItemPanel(
+            }
+                        answersArray.getJSONObject(i).optString("username", "Unknown user"),
+                        answersArray.getJSONObject(i).optString("answer", "")
+                ));
             answerPanel.add(Box.createRigidArea(new Dimension(0,50)));
+            }
         }
         answerScrollPanel.setViewportView(answerPanel);
 
@@ -114,7 +120,34 @@ public class postFrame {
         JTextField answerInput = new JTextField("Answer                                     ");
         answerInput.setSize(300, 16);
         JButton finalAdd = new JButton("Add");
-        finalAdd.addActionListener(e -> man.callAddAnswer(postJson.get("id").toString(), usernameInput.getText(), answerInput.getText()));
+        finalAdd.addActionListener(e -> {
+            String username = usernameInput.getText().trim();
+            String answer = answerInput.getText().trim();
+
+            if (username.equals(usernamePlaceholder)) {
+                username = "";
+            }
+            if (answer.equals(answerPlaceholder)) {
+                answer = "";
+            }
+
+            if (answer.isEmpty()) {
+                return;
+            }
+
+            man.callAddAnswer(postJson.get("id").toString(), username, answer);
+            answerPanel.add(new AnswerItemPanel(username, answer));
+            answerPanel.add(Box.createRigidArea(new Dimension(0,50)));
+            answerPanel.revalidate();
+            answerPanel.repaint();
+
+            answersCount[0]++;
+            answerCountLabel.setText("               " + answersCount[0] + " answers");
+            usernameInput.setText(usernamePlaceholder);
+            usernameInput.setForeground(placeholderColor);
+            answerInput.setText(answerPlaceholder);
+            answerInput.setForeground(placeholderColor);
+        });
         addAnswerPanel.add(usernameInput);
         addAnswerPanel.add(answerInput);
         addAnswerPanel.add(finalAdd);
@@ -129,14 +162,5 @@ public class postFrame {
 
         questionFrame.setVisible(true);
 
-    }
-
-    public JPanel formatAnswer(String username, String answer){
-        JPanel indAnswerPanel = new JPanel();
-        JLabel usernameLabel = new JLabel(username);
-        JLabel answerLabel = new JLabel(answer);
-        indAnswerPanel.add(usernameLabel);
-        indAnswerPanel.add(answerLabel);
-        return indAnswerPanel;
     }
 }
