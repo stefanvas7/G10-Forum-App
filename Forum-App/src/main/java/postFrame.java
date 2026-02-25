@@ -6,6 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.border.EmptyBorder;
 
 public class postFrame {
@@ -17,7 +19,8 @@ public class postFrame {
         JFrame questionFrame = new JFrame("Post Details");
         questionFrame.setSize(1300, 800);
         questionFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        questionFrame.setResizable(false);
+        questionFrame.setResizable(true);
+        questionFrame.setMinimumSize(new Dimension(980, 640));
         questionFrame.setLocationRelativeTo(null);
 
         Color pageBackground = new Color(243, 246, 250);
@@ -289,16 +292,50 @@ public class postFrame {
         button.setOpaque(true);
         button.setFont(new Font("SansSerif", Font.BOLD, 14));
         button.setPreferredSize(new Dimension(140, 38));
+        addButtonInteraction(button, background, new Color(36, 96, 241), new Color(28, 84, 222));
     }
 
     private void styleSecondaryButton(JButton button) {
-        button.setBackground(new Color(235, 239, 246));
+        Color defaultColor = new Color(235, 239, 246);
+        button.setBackground(defaultColor);
         button.setForeground(new Color(52, 63, 79));
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         button.setOpaque(true);
         button.setFont(new Font("SansSerif", Font.BOLD, 14));
         button.setPreferredSize(new Dimension(92, 36));
+        addButtonInteraction(button, defaultColor, new Color(223, 230, 242), new Color(209, 218, 234));
+    }
+
+    private void addButtonInteraction(JButton button, Color defaultColor, Color hoverColor, Color pressedColor) {
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                button.setBackground(hoverColor);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    button.setBackground(pressedColor);
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (button.contains(e.getPoint())) {
+                    button.setBackground(hoverColor);
+                } else {
+                    button.setBackground(defaultColor);
+                }
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(defaultColor);
+            }
+        });
     }
 
     private String cleanInput(String value, String placeholder) {

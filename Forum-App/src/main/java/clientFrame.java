@@ -3,6 +3,8 @@ import org.json.JSONObject;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import static javax.swing.BorderFactory.*;
 
@@ -17,9 +19,15 @@ public class clientFrame {
     private final Color pageBackground = new Color(243, 246, 250);
     private final Color cardBackground = Color.WHITE;
     private final Color cardBorder = new Color(223, 229, 238);
+    private final Color cardBorderHover = new Color(184, 198, 220);
     private final Color primaryText = new Color(30, 34, 41);
     private final Color secondaryText = new Color(93, 101, 115);
     private final Color accent = new Color(46, 107, 255);
+    private final Color accentHover = new Color(36, 96, 241);
+    private final Color accentPressed = new Color(28, 84, 222);
+    private final Color secondaryButton = new Color(235, 239, 246);
+    private final Color secondaryButtonHover = new Color(223, 230, 242);
+    private final Color secondaryButtonPressed = new Color(209, 218, 234);
     private final Font titleFont = new Font("SansSerif", Font.BOLD, 26);
     private final Font subtitleFont = new Font("SansSerif", Font.PLAIN, 14);
     private final Font questionFont = new Font("SansSerif", Font.BOLD, 16);
@@ -31,7 +39,8 @@ public class clientFrame {
         JFrame frame = new JFrame("Forum");
         frame.setSize(1300, 800);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setResizable(false);
+        frame.setResizable(true);
+        frame.setMinimumSize(new Dimension(980, 640));
         frame.setLocationRelativeTo(null);
         frame.getContentPane().setBackground(pageBackground);
         frame.setLayout(new BorderLayout(0, 0));
@@ -122,11 +131,14 @@ public class clientFrame {
             question.setContentAreaFilled(false);
             question.setForeground(primaryText);
             question.setFont(questionFont);
+            question.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
             int index = i;
             String id = temp.get("id").toString();
             postIds[i] = id;
             question.addActionListener(e -> new postFrame(postIds[index]));
+
+            addPostCardHover(card, question, leftMetaPanel, answers);
 
             individualPostPanel[i] = card;
             answerLabels[i] = answers;
@@ -206,16 +218,122 @@ public class clientFrame {
         button.setBorderPainted(false);
         button.setOpaque(true);
         button.setPreferredSize(new Dimension(132, 40));
+        addButtonInteraction(button, accent, accentHover, accentPressed);
     }
 
     private void styleSecondaryButton(JButton button) {
-        button.setBackground(new Color(235, 239, 246));
+        button.setBackground(secondaryButton);
         button.setForeground(new Color(52, 63, 79));
         button.setFont(buttonFont);
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         button.setOpaque(true);
         button.setPreferredSize(new Dimension(98, 36));
+        addButtonInteraction(button, secondaryButton, secondaryButtonHover, secondaryButtonPressed);
+    }
+
+    private void addButtonInteraction(JButton button, Color defaultColor, Color hoverColor, Color pressedColor) {
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                button.setBackground(hoverColor);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    button.setBackground(pressedColor);
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (button.contains(e.getPoint())) {
+                    button.setBackground(hoverColor);
+                } else {
+                    button.setBackground(defaultColor);
+                }
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(defaultColor);
+            }
+        });
+    }
+
+    private void addPostCardHover(JPanel card, JButton question, JComponent... otherComponents) {
+        MouseAdapter hoverHandler = new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                setCardHoverState(card, question, true, false);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    setCardHoverState(card, question, true, true);
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                Point pointer = MouseInfo.getPointerInfo() != null ? MouseInfo.getPointerInfo().getLocation() : null;
+                if (pointer == null) {
+                    setCardHoverState(card, question, false, false);
+                    return;
+                }
+
+                Point cardLocation = card.getLocationOnScreen();
+                Rectangle cardBounds = new Rectangle(cardLocation, card.getSize());
+                setCardHoverState(card, question, cardBounds.contains(pointer), false);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                Point pointer = MouseInfo.getPointerInfo() != null ? MouseInfo.getPointerInfo().getLocation() : null;
+                if (pointer == null) {
+                    setCardHoverState(card, question, false, false);
+                    return;
+                }
+
+                Point cardLocation = card.getLocationOnScreen();
+                Rectangle cardBounds = new Rectangle(cardLocation, card.getSize());
+                if (!cardBounds.contains(pointer)) {
+                    setCardHoverState(card, question, false, false);
+                }
+            }
+        };
+
+        card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        card.addMouseListener(hoverHandler);
+        question.addMouseListener(hoverHandler);
+
+        for (JComponent component : otherComponents) {
+            component.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            component.addMouseListener(hoverHandler);
+        }
+    }
+
+    private void setCardHoverState(JPanel card, JButton question, boolean hovered, boolean pressed) {
+        Color borderColor = hovered ? cardBorderHover : cardBorder;
+        Color background;
+
+        if (pressed) {
+            background = new Color(236, 244, 255);
+        } else if (hovered) {
+            background = new Color(248, 251, 255);
+        } else {
+            background = cardBackground;
+        }
+
+        card.setBackground(background);
+        card.setBorder(createCompoundBorder(
+            createLineBorder(borderColor),
+            createEmptyBorder(14, 16, 14, 16)
+        ));
+        question.setForeground(hovered || pressed ? accent : primaryText);
     }
 
     private void showServerError(JFrame parent) {
