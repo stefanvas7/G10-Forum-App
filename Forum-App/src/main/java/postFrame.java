@@ -6,206 +6,306 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-
-import static javax.swing.BorderFactory.createEtchedBorder;
+import javax.swing.border.EmptyBorder;
 
 public class postFrame {
-    SpringApi man = new SpringApi();
-    public postFrame(String id) {
+    private final SpringApi man = new SpringApi();
 
+    public postFrame(String id) {
         JSONObject postJson = new JSONObject(man.callViewPost(id));
 
-        JFrame questionFrame = new JFrame();
-        questionFrame.setSize(1300,800);
-        questionFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JFrame questionFrame = new JFrame("Post Details");
+        questionFrame.setSize(1300, 800);
+        questionFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         questionFrame.setResizable(false);
-        questionFrame.setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.VERTICAL;
+        questionFrame.setLocationRelativeTo(null);
 
+        Color pageBackground = new Color(243, 246, 250);
+        Color cardBackground = Color.WHITE;
+        Color borderColor = new Color(223, 229, 238);
+        Color primaryText = new Color(30, 34, 41);
+        Color secondaryText = new Color(92, 102, 116);
+        Color placeholderColor = new Color(144, 153, 168);
+        Color inputText = new Color(35, 39, 47);
+        Color accent = new Color(46, 107, 255);
+
+        String usernamePlaceholder = "Username";
+        String answerPlaceholder = "Write your answer...";
+
+        JPanel rootPanel = new JPanel(new BorderLayout(0, 16));
+        rootPanel.setBackground(pageBackground);
+        rootPanel.setBorder(new EmptyBorder(22, 28, 22, 28));
+
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setOpaque(false);
 
         JButton backButton = new JButton("Back");
+        styleSecondaryButton(backButton);
         backButton.addActionListener(e -> questionFrame.dispose());
-        questionFrame.add(backButton);
 
-        JPanel questionPanel = new JPanel();
-        questionPanel.setBorder(createEtchedBorder());
-        questionPanel.setLayout(new GridBagLayout());
-        GridBagConstraints questionC = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 1;
-        c.ipadx = 1000;
-        c.weighty = 1;
-        c.weightx = 1;
-        //questionPanel.setSize(1000,400);
-        //questionFrame.add(questionPanel,c);
+        JPanel titlePanel = new JPanel();
+        titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
+        titlePanel.setOpaque(false);
 
-        //code for the question itself
-        questionC.gridx = 1;
-        questionC.gridy = 0;
-        questionC.ipadx = 200;
-        questionC.weightx = 0.5;
-        //questionC.weightx = 0;
-        //questionC.gridwidth = 2;
+        JLabel title = new JLabel("Post & Answers");
+        title.setForeground(primaryText);
+        title.setFont(new Font("SansSerif", Font.BOLD, 26));
 
-        //ATTEMPT AT USING JTEXTAREA
-        JTextArea questionTextArea = new JTextArea(postJson.get("question").toString(),100, 100);
-        questionTextArea.setFont(new Font("verdana", Font.PLAIN, 20));
+        JLabel subtitle = new JLabel("Read the question details and join the discussion.");
+        subtitle.setForeground(secondaryText);
+        subtitle.setFont(new Font("SansSerif", Font.PLAIN, 14));
+
+        titlePanel.add(title);
+        titlePanel.add(Box.createRigidArea(new Dimension(0, 6)));
+        titlePanel.add(subtitle);
+
+        headerPanel.add(backButton, BorderLayout.WEST);
+        headerPanel.add(titlePanel, BorderLayout.CENTER);
+        rootPanel.add(headerPanel, BorderLayout.NORTH);
+
+        JPanel centerPanel = new JPanel(new BorderLayout(0, 14));
+        centerPanel.setOpaque(false);
+
+        JPanel questionCard = new JPanel();
+        questionCard.setLayout(new BoxLayout(questionCard, BoxLayout.Y_AXIS));
+        questionCard.setBackground(cardBackground);
+        questionCard.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(borderColor),
+            new EmptyBorder(16, 18, 16, 18)
+        ));
+
+        JLabel questionLabel = new JLabel("Question");
+        questionLabel.setForeground(primaryText);
+        questionLabel.setFont(new Font("SansSerif", Font.BOLD, 15));
+        questionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JTextArea questionTextArea = new JTextArea(postJson.optString("question", ""));
         questionTextArea.setEditable(false);
         questionTextArea.setLineWrap(true);
         questionTextArea.setWrapStyleWord(true);
+        questionTextArea.setFont(new Font("SansSerif", Font.PLAIN, 17));
+        questionTextArea.setForeground(primaryText);
+        questionTextArea.setBackground(cardBackground);
+        questionTextArea.setBorder(new EmptyBorder(6, 0, 6, 0));
 
-        //TEST
-        JScrollPane questionTextScroll = new JScrollPane(questionTextArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        questionTextScroll.setSize(new Dimension(400,200));
+        JLabel descriptionLabel = new JLabel("Description");
+        descriptionLabel.setForeground(primaryText);
+        descriptionLabel.setFont(new Font("SansSerif", Font.BOLD, 15));
+        descriptionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        questionC.fill = GridBagConstraints.BOTH;
-        questionC.weighty = 0.5;
-
-        questionPanel.add(questionTextScroll, questionC);
-
-        //code for any extra description to the question
-        questionC.gridx = 1;
-        questionC.gridy = 1;
-        JTextArea descriptionTextArea = new JTextArea("[description");
-        descriptionTextArea.setSize(800,200);
+        String descriptionText = postJson.optString("description", "").trim();
+        if (descriptionText.isEmpty()) {
+            descriptionText = "No description provided.";
+        }
+        JTextArea descriptionTextArea = new JTextArea(descriptionText);
         descriptionTextArea.setEditable(false);
         descriptionTextArea.setLineWrap(true);
         descriptionTextArea.setWrapStyleWord(true);
+        descriptionTextArea.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        descriptionTextArea.setForeground(secondaryText);
+        descriptionTextArea.setBackground(cardBackground);
+        descriptionTextArea.setBorder(new EmptyBorder(6, 0, 0, 0));
 
-        JScrollPane descriptionTextScroll = new JScrollPane(descriptionTextArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        questionC.fill = GridBagConstraints.BOTH;
-        questionC.weighty = 0.5;
+        questionCard.add(questionLabel);
+        questionCard.add(questionTextArea);
+        questionCard.add(Box.createRigidArea(new Dimension(0, 10)));
+        questionCard.add(descriptionLabel);
+        questionCard.add(descriptionTextArea);
 
-        questionPanel.add(descriptionTextScroll, questionC);
+        centerPanel.add(questionCard, BorderLayout.NORTH);
 
         JSONArray answersArray = new JSONArray(postJson.get("answers").toString());
-
         int[] answersCount = {answersArray.length()};
 
-        JLabel answerCountLabel = new JLabel("               " + answersCount[0] + " answers");
-        questionC.gridx = 0;
-        questionC.gridy = 1;
-        questionC.ipadx = 200;
-        questionC.ipady = 100;
-        questionC.weightx = 0;
-        questionPanel.add(answerCountLabel, questionC);
+        JPanel answerSection = new JPanel(new BorderLayout(0, 10));
+        answerSection.setOpaque(false);
 
+        JLabel answerCountLabel = new JLabel(answersCount[0] + " answers");
+        answerCountLabel.setForeground(primaryText);
+        answerCountLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
+        answerSection.add(answerCountLabel, BorderLayout.NORTH);
 
-        questionFrame.add(questionPanel,c);
-
-        JScrollPane answerScrollPanel = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        answerScrollPanel.setSize(500,500);
         JPanel answerPanel = new JPanel();
         answerPanel.setLayout(new BoxLayout(answerPanel, BoxLayout.Y_AXIS));
-        for(int i = 0; i < answersCount[0]; i++){
-            if ("".equals(answersArray.getJSONObject(i).optString("answer", ""))){
+        answerPanel.setBackground(cardBackground);
+        answerPanel.setBorder(new EmptyBorder(12, 12, 12, 12));
+
+        for (int i = 0; i < answersArray.length(); i++) {
+            String answerText = answersArray.getJSONObject(i).optString("answer", "").trim();
+            if (!answerText.isEmpty()) {
                 answerPanel.add(new AnswerItemPanel(
-                        answersArray.getJSONObject(i).optString("username", "Unknown user"),
-                        answersArray.getJSONObject(i).optString("answer", "")
+                    answersArray.getJSONObject(i).optString("username", "Unknown user"),
+                    answerText
                 ));
-                answerPanel.add(Box.createRigidArea(new Dimension(0,50)));
+                answerPanel.add(Box.createRigidArea(new Dimension(0, 14)));
             }
         }
-        answerScrollPanel.setViewportView(answerPanel);
 
-        c.gridy = 2;
-        c.weighty = 1;
+        JScrollPane answerScrollPanel = new JScrollPane(answerPanel);
+        answerScrollPanel.setBorder(BorderFactory.createLineBorder(borderColor));
+        answerScrollPanel.getVerticalScrollBar().setUnitIncrement(12);
+        answerSection.add(answerScrollPanel, BorderLayout.CENTER);
+        centerPanel.add(answerSection, BorderLayout.CENTER);
 
-        questionFrame.add(answerScrollPanel, c);
+        rootPanel.add(centerPanel, BorderLayout.CENTER);
 
-//      adding answers
-        JScrollPane addAnswerScroll = new JScrollPane();
         JPanel addAnswerPanel = new JPanel();
-        String usernamePlaceholder = "Username";
-        String answerPlaceholder = "Answer";
-        Color placeholderColor = Color.GRAY;
-        Color inputColor = Color.BLACK;
+        addAnswerPanel.setLayout(new BoxLayout(addAnswerPanel, BoxLayout.Y_AXIS));
+        addAnswerPanel.setBackground(cardBackground);
+        addAnswerPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(borderColor),
+            new EmptyBorder(14, 16, 14, 16)
+        ));
 
-        JTextField usernameInput = new JTextField(15);
-        JTextField answerInput = new JTextField(40);
-        usernameInput.setText(usernamePlaceholder);
+        JLabel addAnswerLabel = new JLabel("Add your answer");
+        addAnswerLabel.setForeground(primaryText);
+        addAnswerLabel.setFont(new Font("SansSerif", Font.BOLD, 15));
+        addAnswerLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JPanel rowPanel = new JPanel(new BorderLayout(12, 0));
+        rowPanel.setOpaque(false);
+        rowPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JTextField usernameInput = new JTextField(usernamePlaceholder);
         usernameInput.setForeground(placeholderColor);
-        answerInput.setText(answerPlaceholder);
+        usernameInput.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        usernameInput.setBorder(new EmptyBorder(10, 12, 10, 12));
+        addPlaceholderBehavior(usernameInput, usernamePlaceholder, placeholderColor, inputText);
+
+        JPanel usernameWrapper = new JPanel(new BorderLayout());
+        usernameWrapper.setBackground(Color.WHITE);
+        usernameWrapper.setBorder(BorderFactory.createLineBorder(borderColor));
+        usernameWrapper.setPreferredSize(new Dimension(220, 42));
+        usernameWrapper.add(usernameInput, BorderLayout.CENTER);
+
+        JTextArea answerInput = new JTextArea(answerPlaceholder);
         answerInput.setForeground(placeholderColor);
+        answerInput.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        answerInput.setLineWrap(true);
+        answerInput.setWrapStyleWord(true);
+        answerInput.setBorder(new EmptyBorder(10, 12, 10, 12));
+        addPlaceholderBehavior(answerInput, answerPlaceholder, placeholderColor, inputText);
 
-        usernameInput.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (usernameInput.getText().equals(usernamePlaceholder)) {
-                    usernameInput.setText("");
-                    usernameInput.setForeground(inputColor);
-                }
-            }
+        JScrollPane answerInputScroll = new JScrollPane(answerInput);
+        answerInputScroll.setBorder(BorderFactory.createLineBorder(borderColor));
+        answerInputScroll.setPreferredSize(new Dimension(760, 82));
 
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (usernameInput.getText().trim().isEmpty()) {
-                    usernameInput.setText(usernamePlaceholder);
-                    usernameInput.setForeground(placeholderColor);
-                }
-            }
-        });
+        rowPanel.add(usernameWrapper, BorderLayout.WEST);
+        rowPanel.add(answerInputScroll, BorderLayout.CENTER);
 
-        answerInput.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (answerInput.getText().equals(answerPlaceholder)) {
-                    answerInput.setText("");
-                    answerInput.setForeground(inputColor);
-                }
-            }
+        JPanel buttonRow = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        buttonRow.setOpaque(false);
+        buttonRow.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (answerInput.getText().trim().isEmpty()) {
-                    answerInput.setText(answerPlaceholder);
-                    answerInput.setForeground(placeholderColor);
-                }
-            }
-        });
-        JButton finalAdd = new JButton("Add");
+        JButton finalAdd = new JButton("Add Answer");
+        stylePrimaryButton(finalAdd, accent);
         finalAdd.addActionListener(e -> {
-            String username = usernameInput.getText().trim();
-            String answer = answerInput.getText().trim();
-
-            if (username.equals(usernamePlaceholder)) {
-                username = "";
-            }
-            if (answer.equals(answerPlaceholder)) {
-                answer = "";
-            }
+            String username = cleanInput(usernameInput.getText(), usernamePlaceholder);
+            String answer = cleanInput(answerInput.getText(), answerPlaceholder);
 
             if (answer.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                    questionFrame,
+                    "Please enter an answer before submitting.",
+                    "Missing answer",
+                    JOptionPane.WARNING_MESSAGE
+                );
                 return;
             }
 
             man.callAddAnswer(postJson.get("id").toString(), username, answer);
-            answerPanel.add(new AnswerItemPanel(username, answer));
-            answerPanel.add(Box.createRigidArea(new Dimension(0,50)));
+            answerPanel.add(new AnswerItemPanel(username.isEmpty() ? "Unknown user" : username, answer));
+            answerPanel.add(Box.createRigidArea(new Dimension(0, 14)));
             answerPanel.revalidate();
             answerPanel.repaint();
 
             answersCount[0]++;
-            answerCountLabel.setText("               " + answersCount[0] + " answers");
+            answerCountLabel.setText(answersCount[0] + " answers");
+
             usernameInput.setText(usernamePlaceholder);
             usernameInput.setForeground(placeholderColor);
             answerInput.setText(answerPlaceholder);
             answerInput.setForeground(placeholderColor);
         });
-        addAnswerPanel.add(usernameInput);
-        addAnswerPanel.add(answerInput);
-        addAnswerPanel.add(finalAdd);
+        buttonRow.add(finalAdd);
 
-        addAnswerScroll.setViewportView(addAnswerPanel);
+        addAnswerPanel.add(addAnswerLabel);
+        addAnswerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        addAnswerPanel.add(rowPanel);
+        addAnswerPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        addAnswerPanel.add(buttonRow);
 
-        c.gridy = 3;
-        questionFrame.add(addAnswerPanel,c);
+        rootPanel.add(addAnswerPanel, BorderLayout.SOUTH);
 
-
-
-
+        questionFrame.setContentPane(rootPanel);
         questionFrame.setVisible(true);
+    }
 
+    private void addPlaceholderBehavior(JTextField field, String placeholder, Color placeholderColor, Color inputColor) {
+        field.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (field.getText().equals(placeholder)) {
+                    field.setText("");
+                    field.setForeground(inputColor);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (field.getText().trim().isEmpty()) {
+                    field.setText(placeholder);
+                    field.setForeground(placeholderColor);
+                }
+            }
+        });
+    }
+
+    private void addPlaceholderBehavior(JTextArea field, String placeholder, Color placeholderColor, Color inputColor) {
+        field.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (field.getText().equals(placeholder)) {
+                    field.setText("");
+                    field.setForeground(inputColor);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (field.getText().trim().isEmpty()) {
+                    field.setText(placeholder);
+                    field.setForeground(placeholderColor);
+                }
+            }
+        });
+    }
+
+    private void stylePrimaryButton(JButton button, Color background) {
+        button.setBackground(background);
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setOpaque(true);
+        button.setFont(new Font("SansSerif", Font.BOLD, 14));
+        button.setPreferredSize(new Dimension(140, 38));
+    }
+
+    private void styleSecondaryButton(JButton button) {
+        button.setBackground(new Color(235, 239, 246));
+        button.setForeground(new Color(52, 63, 79));
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setOpaque(true);
+        button.setFont(new Font("SansSerif", Font.BOLD, 14));
+        button.setPreferredSize(new Dimension(92, 36));
+    }
+
+    private String cleanInput(String value, String placeholder) {
+        String text = value == null ? "" : value.trim();
+        if (text.equals(placeholder)) {
+            return "";
+        }
+        return text;
     }
 }
