@@ -26,7 +26,7 @@ public class SpringApi {
     }
 
     public void callAddAnswer(String questionID, String username, String answer){
-        restTemplate.getForEntity(apiUrl + "/post/" + questionID + "/" + answer + "/description/" + username, String.class);
+        restTemplate.getForEntity(apiUrl + "/post/" + questionID + "/" + answer + "/"+ username, String.class);
     }
     public String callNextPage(int pageNumber){
         ResponseEntity<String> response = restTemplate.getForEntity(apiUrl + "/next/" + pageNumber, String.class);
