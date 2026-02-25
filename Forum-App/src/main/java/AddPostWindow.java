@@ -20,7 +20,8 @@ public class AddPostWindow {
         JFrame addFrame = new JFrame("Create Post");
         addFrame.setSize(920, 620);
         addFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        addFrame.setResizable(false);
+        addFrame.setResizable(true);
+        addFrame.setMinimumSize(new Dimension(760, 520));
         addFrame.setLocationRelativeTo(null);
 
         Color pageBackground = new Color(243, 246, 250);
