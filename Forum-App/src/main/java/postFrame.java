@@ -4,6 +4,8 @@ import org.json.JSONObject;
 import javax.swing.*;
 
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 
 import static javax.swing.BorderFactory.createEtchedBorder;
 
@@ -99,11 +101,10 @@ public class postFrame {
         for(int i = 0; i < answersCount[0]; i++){
             if ("".equals(answersArray.getJSONObject(i).optString("answer", ""))){
                 answerPanel.add(new AnswerItemPanel(
-            }
                         answersArray.getJSONObject(i).optString("username", "Unknown user"),
                         answersArray.getJSONObject(i).optString("answer", "")
                 ));
-            answerPanel.add(Box.createRigidArea(new Dimension(0,50)));
+                answerPanel.add(Box.createRigidArea(new Dimension(0,50)));
             }
         }
         answerScrollPanel.setViewportView(answerPanel);
@@ -116,9 +117,53 @@ public class postFrame {
 //      adding answers
         JScrollPane addAnswerScroll = new JScrollPane();
         JPanel addAnswerPanel = new JPanel();
-        JTextField usernameInput = new JTextField("Username");
-        JTextField answerInput = new JTextField("Answer                                     ");
-        answerInput.setSize(300, 16);
+        String usernamePlaceholder = "Username";
+        String answerPlaceholder = "Answer";
+        Color placeholderColor = Color.GRAY;
+        Color inputColor = Color.BLACK;
+
+        JTextField usernameInput = new JTextField(15);
+        JTextField answerInput = new JTextField(40);
+        usernameInput.setText(usernamePlaceholder);
+        usernameInput.setForeground(placeholderColor);
+        answerInput.setText(answerPlaceholder);
+        answerInput.setForeground(placeholderColor);
+
+        usernameInput.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (usernameInput.getText().equals(usernamePlaceholder)) {
+                    usernameInput.setText("");
+                    usernameInput.setForeground(inputColor);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (usernameInput.getText().trim().isEmpty()) {
+                    usernameInput.setText(usernamePlaceholder);
+                    usernameInput.setForeground(placeholderColor);
+                }
+            }
+        });
+
+        answerInput.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (answerInput.getText().equals(answerPlaceholder)) {
+                    answerInput.setText("");
+                    answerInput.setForeground(inputColor);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (answerInput.getText().trim().isEmpty()) {
+                    answerInput.setText(answerPlaceholder);
+                    answerInput.setForeground(placeholderColor);
+                }
+            }
+        });
         JButton finalAdd = new JButton("Add");
         finalAdd.addActionListener(e -> {
             String username = usernameInput.getText().trim();
